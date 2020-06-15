@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Contract;
+using Grpc.Core;
 using ProtoBuf.Grpc;
 
 namespace Service
@@ -15,6 +16,19 @@ namespace Service
             {
                 Result = request.X * request.Y
             });
+
+        public ValueTask<DivisionResult> DivisionAsync(DivisionRequest request, CallContext context = default)
+        {
+            if (request.Y == 0.0D)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, $"Divider Y is zero"));
+            }
+
+            return new ValueTask<DivisionResult>(new DivisionResult
+            {
+                Result = request.X / request.Y
+            });
+        }
     }
 
     public class Clock : ITimeService
